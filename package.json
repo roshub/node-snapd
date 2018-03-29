@@ -1,0 +1,22 @@
+{
+  "name": "vapor-snap",
+  "version": "0.1.0",
+  "description": "nodejs client interface to ubuntu core snapd api",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node ./test/index.js",
+    "lint": "./node_modules/.bin/eslint ./src/"
+  },
+  "author": "michael philetus weller <philetus@roshub.io>",
+  "license": "UNLICENSED",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "eslint": "^4.18.2",
+    "eslint-config-standard": "github:standard/eslint-config-standard",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
