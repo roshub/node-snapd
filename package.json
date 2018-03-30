@@ -1,5 +1,5 @@
 {
-  "name": "vapor-snap",
+  "name": "node-snapd",
   "version": "0.1.0",
   "description": "nodejs client interface to ubuntu core snapd api",
   "main": "src/index.js",
