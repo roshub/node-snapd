@@ -246,7 +246,7 @@ exports.abort = async ({ id, auth }) => {
   return Promise.reject(new Error('malformed response'))
 }
 
-exports.listInterfaces = async ({ auth }) => {
+exports.listInterfaces = async ({ auth }={}) => {
   const response = await rest({
     auth: auth || await exports.readAuth(),
     method: 'GET',
