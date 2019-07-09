@@ -1,6 +1,6 @@
 {
   "name": "node-snapd",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "nodejs client interface to ubuntu core snapd api",
   "main": "src/index.js",
   "scripts": {

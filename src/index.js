@@ -40,7 +40,9 @@ const rest = ({auth, method, path, data}) => {
           return resolve(json)
         }
 
-        return reject(new Error(`response status: ${res.statusCode}`))
+        const json = JSON.parse(body)
+
+        return reject(new Error(`response code: ${res.statusCode}, msg: ${json.result.message}, kind: ${json.result.kind}`))
       })
     })
 
