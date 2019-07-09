@@ -1,14 +1,14 @@
 {
   "name": "node-snapd",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "nodejs client interface to ubuntu core snapd api",
   "main": "src/index.js",
   "scripts": {
     "test": "node ./test/index.js",
     "lint": "./node_modules/.bin/eslint ./src/"
   },
-  "author": "michael philetus weller <philetus@roshub.io>",
-  "license": "UNLICENSED",
+  "author": "RosHub Inc. <code@roshub.io>",
+  "license": "Apache-2.0",
   "dependencies": {
   },
   "devDependencies": {
