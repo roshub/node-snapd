@@ -1,6 +1,8 @@
 'use strict'
 
-const snap = require('../src/index.js')
+const Snap = require('../src/index.js')
+
+let snap = new Snap()
 
 snap.readAuth()
   .then(res => console.log('snap.readAuth() ->', res))
