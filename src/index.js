@@ -53,7 +53,7 @@ const rest = ({auth, method, path, data}) => {
 
         const json = JSON.parse(body)
 
-        return reject(new SnapdError(body))
+        return reject(new SnapdError(json))
       })
     })
 
