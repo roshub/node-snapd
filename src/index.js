@@ -11,7 +11,7 @@ const reach = require('./reach')
 class SnapdError extends Error {
   constructor(body){
     super(reach(body, 'result.message') || 'something went wrong')
-    Error.captureStackTrace(this, SnapdError)
+    //Error.captureStackTrace(this, SnapdError)
     this.code = reach(body, 'result.kind')
   }
 }
