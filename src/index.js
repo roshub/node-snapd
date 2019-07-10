@@ -5,6 +5,17 @@ const path = require('path')
 const fs = require('fs')
 const os = require('os')
 
+const reach = require('./reach')
+
+
+class SnapdError extends Error {
+  constructor(body){
+    super(reach(body, 'result.message') || 'something went wrong')
+    Error.captureStackTrace(this, SnapdError)
+    this.code = reach(body, 'result.kind')
+  }
+}
+
 // make restful call to snapd process thru /run/snapd.socket
 const rest = ({auth, method, path, data}) => {
   return new Promise((resolve, reject) => {
@@ -42,7 +53,7 @@ const rest = ({auth, method, path, data}) => {
 
         const json = JSON.parse(body)
 
-        return reject(new Error(`response code: ${res.statusCode}, msg: ${json.result.message}, kind: ${json.result.kind}`))
+        return reject(new SnapdError(body))
       })
     })
 
