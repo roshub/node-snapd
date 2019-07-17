@@ -1,7 +1,7 @@
 # node-snapd
 *nodejs client interface to ubuntu [core snapd rest api](https://github.com/snapcore/snapd/wiki/REST-API)*
 
-<img src=https://img.shields.io/npm/v/node-snapd.svg>
+[<img src=https://img.shields.io/npm/v/node-snapd.svg>](https://www.npmjs.com/package/node-snapd)
 
 With node-snapd, you can now easily introspect the Snapd host and the installed Snap packages. 
 

@@ -1,6 +1,6 @@
 {
   "name": "node-snapd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "nodejs client interface to ubuntu core snapd api",
   "main": "src/index.js",
   "scripts": {
@@ -26,5 +26,15 @@
     "eslint-plugin-standard": "^3.0.1",
     "docdash": "^1.1.1",
     "jsdoc": "^3.6.2"
-  }
+  },
+  "keywords": [
+    "snap",
+    "snapcraft",
+    "apt",
+    "flatpack",
+    "deb",
+    "snapd",
+    "snappy",
+    "ubuntu"
+  ]
 }
