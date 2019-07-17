@@ -5,7 +5,7 @@
 
 With node-snapd, you can now easily introspect the Snapd host and the installed Snap packages. 
 
-[https://roshub.github.io/node-snapd/index.html](API Documentation)
+[API Documentation](https://roshub.github.io/node-snapd/index.html)
 
 ```
 const Snapd = require('node-snapd')
