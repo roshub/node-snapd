@@ -7,23 +7,46 @@ const os = require('os')
 
 const reach = require('./reach')
 
-
+/**
+ * Represents a snapd formatter error
+ * @class
+ * @param {object}    body
+ */
 class SnapdError extends Error {
   constructor(body){
     super(reach(body, 'result.message') || 'something went wrong')
-    //Error.captureStackTrace(this, SnapdError)
+    Error.captureStackTrace(this, SnapdError)
     this.code = reach(body, 'result.kind')
   }
 }
 
+
+/**
+ * A snap client instance which makes restful call to snapd process using Unix sockets
+ * @class
+ * @param {string}  authFile    Defaults to `$HOME/.snap/auth.json`
+ * @param {string}  socketPath  Defaults to `/run/snapd.socket`
+ */
 class SnapClient {
-  constructor(authFile=path.join(os.homedir(), '.snap', 'auth.json')){
+  constructor(
+    authFile=path.join(os.homedir(), '.snap', 'auth.json'),
+    socketPath=`/run/snapd.socket`
+  ){
     this.auth = undefined
+    this.socketPath = socketPath
   }
 
 
-  // make restful call to snapd process thru /run/snapd.socket
-  rest({auth, method, path, data}) {
+  /**
+   * make restful call to snapd process thru /run/snapd.socket
+   * @method
+   * @param {object}  options
+   * @param {object}  options.auth
+   * @param {string}  options.method
+   * @param {string}  options.path
+   * @param {string}  options.data
+   */
+  async rest({auth, method, path, data}) {
     return new Promise((resolve, reject) => {
       const post = method === 'POST'
       const headers = { 'Content-Type': 'application/json' }
@@ -35,7 +58,7 @@ class SnapClient {
       }
 
       const options = {
-        socketPath: '/run/snapd.socket',
+        socketPath: this.socketPath,
         path: path,
         method: post ? 'POST' : 'GET',
         headers: headers
@@ -75,8 +98,13 @@ class SnapClient {
     })
   }
 
-  // read auth email & macaroon from ~/.snap/auth.json
-  readAuth(filename) {
+
+  /**
+   * read auth email & macaroon from ~/.snap/auth.json
+   * @method
+   * @param {string}  filename
+   */
+  async readAuth(filename) {
 
     if(this.auth){
       return Promise.resolve({ email: this.auth.email, macaroon: this.auth.macaroon })
@@ -100,9 +128,16 @@ class SnapClient {
     })
   }
 
-  // *** login & logout require root privilege ***
 
-  // returns auth with macaroon but *doesnt really login*
+  /**
+   * login may require root privilege
+   * @method
+   * @param {object}  options
+   * @param {object}  options.auth
+   * @param {string}  options.method
+   * @param {string}  options.path
+   * @param {string}  options.data
+   */
   async login({ email, password, otp }) {
     const data = {
       email: email,
@@ -126,7 +161,12 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
-  // as login doesnt login this *always fails?*
+  /**
+   * logout may require root privilege
+   * @method
+   * @param {object}  options
+   * @param {object}  options.auth
+   */
   async logout({ auth }) {
     const response = await this.rest({
       auth: auth || await this.readAuth(),
@@ -141,7 +181,10 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
-  // return list of installed snaps
+  /**
+   * list of installed snaps
+   * @method
+   */
   async listSnaps() {
     const response = await this.rest({
       method: 'GET',
@@ -152,9 +195,15 @@ class SnapClient {
       return response.result.map(entry => entry.name)
     }
 
-    return Promise.reject(new Error('malformed response'))
+    throw new Error('malformed response')
   }
 
+  /**
+   * Get detailed info about a snap
+   * @method
+   * @param {object}  options
+   * @param {object}  options.name
+   */
   async info({ name }) {
 
     if (typeof name !== 'string') {
@@ -173,6 +222,15 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.action
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async modify({ action, name, auth, ...opts }) {
 
     if (typeof name !== 'string') {
@@ -207,35 +265,97 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async install ({ name, auth, ...opts }) {
-    return modify({ action: 'install', name, auth, ...opts })
+    return this.modify({ action: 'install', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async remove ({ name, auth, ...opts }) {
-    return modify({ action: 'remove', name, auth, ...opts })
+    return this.modify({ action: 'remove', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async switch ({ name, auth, ...opts }) {
-    return modify({ action: 'switch', name, auth, ...opts })
+    return this.modify({ action: 'switch', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async refresh ({ name, auth, ...opts }) {
-    return modify({ action: 'refresh', name, auth, ...opts })
+    return this.modify({ action: 'refresh', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async revert ({ name, auth, ...opts }) {
-    return modify({ action: 'revert', name, auth, ...opts })
+    return this.modify({ action: 'revert', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async enable ({ name, auth, ...opts }) {
-    return modify({ action: 'enable', name, auth, ...opts })
+    return this.modify({ action: 'enable', name, auth, ...opts })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async disable ({ name, auth, ...opts }) {
-    return modify({ action: 'disable', name, auth, ...opts })
+    return this.modify({ action: 'disable', name, auth, ...opts })
   }
 
-  // check on status of change by id (or all changes without id arg)
+  /**
+   * check on status of change by id (or all changes without id arg)
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.id
+   */
   async status ({ id }) {
     const response = await this.rest({
       method: 'GET',
@@ -249,7 +369,15 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
-  // abort ongoing change by id
+  /**
+   * abort ongoing change by id
+   * 
+   * @method
+   * @param {object}  options
+
+   * @param {string}  options.id
+   * @param {object}  options.auth
+   */
   async abort ({ id, auth }) {
 
     if (typeof id !== 'string') {
@@ -270,6 +398,12 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {object}  options.auth
+   */
   async listInterfaces ({ auth }={}) {
     const response = await this.rest({
       auth: auth || await this.readAuth(),
@@ -284,6 +418,15 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.action
+   * @param {object}  options.slot
+   * @param {object}  options.plug
+   * @param {object}  options.auth
+   */
   async modifyInterface ({ action, slot, plug, auth }) {
 
     const data = {
@@ -306,10 +449,27 @@ class SnapClient {
     return Promise.reject(new Error('malformed response'))
   }
 
+
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {object}  options.slot
+   * @param {object}  options.plug
+   * @param {object}  options.auth
+   */
   async connect ({ slot, plug, auth }) {
     return this.modifyInterface({ action: 'connect', slot, plug, auth })
   }
 
+  /**
+   * 
+   * @method
+   * @param {object}  options
+   * @param {string}  options.name
+   * @param {object}  options.auth
+   * @param {object}  options.opts
+   */
   async disconnect ({ slot, plug, auth }) {
     return this.modifyInterface({ action: 'disconnect', slot, plug, auth })
   }

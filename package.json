@@ -1,11 +1,12 @@
 {
   "name": "node-snapd",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "nodejs client interface to ubuntu core snapd api",
   "main": "src/index.js",
   "scripts": {
     "test": "node ./test/index.js",
-    "lint": "./node_modules/.bin/eslint ./src/"
+    "lint": "./node_modules/.bin/eslint ./src/",
+    "build-docs": "npx jsdoc -c jsdoc.json"
   },
   "author": "RosHub Inc. <code@roshub.io>",
   "license": "Apache-2.0",
@@ -22,6 +23,8 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint-plugin-standard": "^3.0.1",
+    "docdash": "^1.1.1",
+    "jsdoc": "^3.6.2"
   }
 }
